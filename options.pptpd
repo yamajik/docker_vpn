@@ -1,0 +1,8 @@
+#custom settings for a simple fast pptp server 
+ms-dns 8.8.8.8 
+ms-dns 4.2.2.2 
+lock 
+name pptpd 
+require-mschap-v2 
+# Require MPPE 128-bit encryption 
+# (note that MPPE requires the use of MSCHAP-V2 during authentication) require-mppe-128
