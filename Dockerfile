@@ -1,25 +1,21 @@
-FROM centos:6.7
+FROM buildpack-deps:jessie
 
 MAINTAINER majik mumu296979387@gmail.com
 
-ENV REFRESHED_AT 2015-12-03
+ENV REFRESHED_AT 2015-12-07
 
 USER root
 
-RUN yum install wget -y
+EXPOSE 1723
 
-RUN wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm && rpm -Uvh epel-release-6*.rpm
+ADD ./config/pptpd.conf /vpn/pptpd.conf
 
-RUN yum install pptpd.x86_64 -y
+ADD ./config/chap-secrets /vpn/chap-secrets
 
-ADD ./config/pptpd.conf /etc/pptpd.conf
+ADD ./config/options.pptpd /vpn/options.pptpd
 
-ADD ./config/chap-secrets /etc/ppp/chap-secrets
-
-ADD ./config/options.pptpd /etc/ppp/options.pptpd
+ADD ./config/sysctl.conf /vpn/sysctl.conf
 
 ADD ./pptp_start.sh /vpn/pptp_start.sh
-
-EXPOSE 1723
 
 ENTRYPOINT . /vpn/pptp_start.sh

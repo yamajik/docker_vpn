@@ -1,17 +1,23 @@
+apt-get update
+
+apt-get install -y pptpd iptables-persistent
+
+save
+
+cat /vpn/pptpd.conf >> /etc/pptpd.conf
+
+cat /vpn/chap-secrets > /etc/ppp/chap-secrets
+
+cat /vpn/options.pptpd >> /etc/ppp/options.pptpd
+
+cat /vpn/sysctl.conf >> /etc/sysctl.conf
+
 sysctl -p
 
-iptables -A INPUT -i eth0 -p tcp --dport 1723 -j ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE && /etc/init.d/iptables-persistent save
 
-iptables -A INPUT -i eth0 -p gre -j ACCEPT
+# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -A INPUT -i eth0 -p tcp --dport 1723 -j ACCEPT && iptables -A INPUT -i eth0 -p gre -j ACCEPT && iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-iptables -A FORWARD -i ppp+ -o eth0 -j ACCEPT
-
-iptables -A FORWARD -i eth0 -o ppp+ -j ACCEPT
-
-service iptables save
-
-service iptables restart
-
-pptpd restart-kill && pptpd start
+service pptpd restart
